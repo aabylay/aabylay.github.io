@@ -63,6 +63,34 @@ ul li {
     padding: 5px 0;
 }
 
+.pub-list,
+.project-list {
+    text-align: left;
+    padding-left: 1.25em;
+    margin: 8px 0 20px;
+    font-size: 0.9em;
+}
+
+.pub-list {
+    list-style-type: decimal;
+}
+
+.project-list {
+    list-style-type: disc;
+}
+
+.pub-list li,
+.project-list li {
+    padding: 8px 0;
+    line-height: 1.45;
+}
+
+.publications,
+.projects,
+.updates {
+    margin-top: 18px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
