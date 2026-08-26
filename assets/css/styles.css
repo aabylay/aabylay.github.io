@@ -134,3 +134,10 @@ a:hover {
     color: #0056b3;  /* Change to a darker shade or another color when hovering */
     text-decoration: underline;  /* Optional: underline on hover */
 }
+
+.copyright {
+    text-align: left;
+    font-size: 0.8em;
+    color: #777;
+    margin: 24px 0 0;
+}

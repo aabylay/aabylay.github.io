@@ -411,6 +411,11 @@ select {
   font-size: 0.78rem;
 }
 
+.copyright {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 .noscript {
   margin: 1rem;
   padding: 0.75rem;
