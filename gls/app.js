@@ -398,17 +398,17 @@ function draw(m) {
 }
 
 function renderPanel(m) {
-  const sg = fmt(m.sigmaG, 3);
-  const sl = fmt(m.sigmaL, 3);
-  el.termG.textContent = "N_f/N = " + m.nG + "/" + state.n + " = " + sg;
-  el.termL.textContent = "N_l/k = " + m.nL + "/" + state.k + " = " + sl;
+  const sg = fmt(m.sigmaG, 2);
+  const sl = fmt(m.sigmaL, 2);
+  el.termG.textContent = "σ_g = N_f/N = " + m.nG + "/" + state.n + " = " + sg;
+  el.termL.textContent = "σ_l = k_f/k = " + m.nL + "/" + state.k + " = " + sl;
 
   if (!(m.sigmaG > 0)) {
     el.termR.textContent = "σ_l/σ_g = n/a";
     el.termRho.textContent = "n/a";
   } else {
-    el.termR.textContent = "σ_l/σ_g = " + sl + "/" + sg + " = " + fmt(m.r, 3);
-    el.termRho.textContent = fmt(m.rho, 3);
+    el.termR.textContent = "r = σ_l/σ_g = " + sl + "/" + sg + " = " + fmt(m.r, 2);
+    el.termRho.textContent = "ρ = (r-1)/(r+1) = " + fmt(m.rho, 2);
   }
 
   if (m.rho === null) {
@@ -421,13 +421,13 @@ function renderPanel(m) {
     el.rhoKnob.style.left = 100 * Math.min(1, Math.max(0, t)) + "%";
     if (m.rho > RHO_NEUTRAL) {
       el.badge.className = "badge enrich";
-      el.badge.textContent = "enrichment / easier";
+      el.badge.textContent = "easier";
     } else if (m.rho < -RHO_NEUTRAL) {
       el.badge.className = "badge deplete";
-      el.badge.textContent = "depletion / harder";
+      el.badge.textContent = "harder";
     } else {
       el.badge.className = "badge neutral";
-      el.badge.textContent = "neutral / independent";
+      el.badge.textContent = "neutral";
     }
   }
 

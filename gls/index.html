@@ -7,7 +7,7 @@
   <title>GLS Correlation Demo</title>
   <meta name="description" content="Interactive demo of global vs local filter selectivity (GLS) from Filtered Approximate Nearest Neighbor Search in Vector Databases, VLDB 2026 VecDB Workshop.">
   <link rel="icon" type="image/png" href="../user.png">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <header class="site-header">
@@ -50,25 +50,29 @@
     <section class="side-panel">
       <div class="metrics-card">
         <div class="terms" id="terms">
-          <p class="term">
-            <span class="term-ex"><strong>Global selectivity (σ<sub>g</sub>):</strong> how often the filter fires in the whole set.</span>
-            <span class="term-val" id="term-g"></span>
-          </p>
-          <p class="term">
-            <span class="term-ex"><strong>Local selectivity (σ<sub>l</sub>):</strong> how often the filter fires among the query’s <i>k</i> nearest neighbors.</span>
+          <div class="term">
+            <span class="term-label"><strong>Local selectivity (σ<sub>l</sub>):</strong></span>
             <span class="term-val" id="term-l"></span>
-          </p>
-          <p class="term">
-            <span class="term-ex"><strong>Selectivity ratio (<i>r</i>):</strong> local vs global. <i>r</i> &gt; 1 enrichment, <i>r</i> &lt; 1 depletion.</span>
+            <span class="term-ex">how often the filter fires among the query’s <i>k</i> nearest neighbors.</span>
+          </div>
+          <div class="term">
+            <span class="term-label"><strong>Global selectivity (σ<sub>g</sub>):</strong></span>
+            <span class="term-val" id="term-g"></span>
+            <span class="term-ex">how often the filter fires in the whole set.</span>
+          </div>
+          <div class="term">
+            <span class="term-label"><strong>Selectivity ratio (<i>r</i>):</strong></span>
             <span class="term-val" id="term-r"></span>
-          </p>
-          <p class="term">
-            <span class="term-ex"><strong>GLS correlation (ρ<sub>q</sub>):</strong> Mapping GLS ratio to a range [−1, 1). Positive → easier filtered queries; negative → harder.</span>
+            <span class="term-ex"><i>r</i> &gt; 1 enrichment, <i>r</i> &lt; 1 depletion.</span>
+          </div>
+          <div class="term">
+            <span class="term-label"><strong>GLS correlation (ρ):</strong></span>
             <span class="term-val-wrap">
               <span class="term-val" id="term-rho"></span>
               <span class="badge" id="badge" hidden></span>
             </span>
-          </p>
+            <span class="term-ex">Mapping GLS ratio to a range [−1, 1) using bilinear (Möbius) transformation. Positive → easier filtered queries; negative → harder.</span>
+          </div>
         </div>
         <div class="rho-meter" aria-hidden="true">
           <div class="rho-meter-track">
@@ -138,6 +142,6 @@
   <noscript>
     <p class="noscript">This demo needs JavaScript (vanilla Canvas, no libraries) to draw the plot and compute GLS.</p>
   </noscript>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
