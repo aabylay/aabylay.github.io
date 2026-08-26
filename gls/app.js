@@ -307,6 +307,18 @@ function drawPoint(ctx, x, y, radius, fill, stroke, lineWidth) {
   ctx.stroke();
 }
 
+function drawKnnPass(ctx, x, y, radius) {
+  const ring = Math.max(2.4, radius * 0.42);
+  ctx.beginPath();
+  ctx.arc(x, y, radius + ring * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = "#3d7aff";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y, Math.max(1.6, radius - ring * 0.55), 0, Math.PI * 2);
+  ctx.fillStyle = "#7dcc7d";
+  ctx.fill();
+}
+
 function syncCanvasSize() {
   const canvas = el.plot;
   const dpr = window.devicePixelRatio || 1;
@@ -365,7 +377,7 @@ function draw(m) {
   for (let i = 0; i < n; i++) {
     if (!inKnn[i]) continue;
     const [px, py] = toCanvas(x[i], y[i]);
-    if (pass[i]) drawPoint(ctx, px, py, rKnn, "#7dcc7d", "#6a6ad4", 2);
+    if (pass[i]) drawKnnPass(ctx, px, py, rKnn);
     else drawPoint(ctx, px, py, rKnn, "#6a6ad4", "#222", 1.5);
   }
   ctx.restore();
@@ -388,18 +400,15 @@ function draw(m) {
 function renderPanel(m) {
   const sg = fmt(m.sigmaG, 3);
   const sl = fmt(m.sigmaL, 3);
-  el.termG.innerHTML =
-    "σ<sub>g</sub> = N<sub>f</sub>/N = " + m.nG + "/" + state.n + " = " + sg;
-  el.termL.innerHTML =
-    "σ<sub>l</sub> = N<sub>l</sub>/k = " + m.nL + "/" + state.k + " = " + sl;
+  el.termG.textContent = "N_f/N = " + m.nG + "/" + state.n + " = " + sg;
+  el.termL.textContent = "N_l/k = " + m.nL + "/" + state.k + " = " + sl;
 
   if (!(m.sigmaG > 0)) {
-    el.termR.innerHTML = "r = σ<sub>l</sub>/σ<sub>g</sub> = n/a";
-    el.termRho.innerHTML = "ρ<sub>q</sub> = n/a";
+    el.termR.textContent = "σ_l/σ_g = n/a";
+    el.termRho.textContent = "n/a";
   } else {
-    el.termR.innerHTML =
-      "r = σ<sub>l</sub>/σ<sub>g</sub> = " + sl + "/" + sg + " = " + fmt(m.r, 3);
-    el.termRho.innerHTML = "ρ<sub>q</sub> = " + fmt(m.rho, 3);
+    el.termR.textContent = "σ_l/σ_g = " + sl + "/" + sg + " = " + fmt(m.r, 3);
+    el.termRho.textContent = fmt(m.rho, 3);
   }
 
   if (m.rho === null) {
