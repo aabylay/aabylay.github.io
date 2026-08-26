@@ -60,21 +60,10 @@ a:hover {
 }
 
 .site-header h1 {
-  margin: 0 0 0.45rem;
+  margin: 0 0 0.55rem;
   font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-}
-
-.lede {
-  margin: 0 0 0.85rem;
-  max-width: 46rem;
-  font-size: 0.98rem;
-  color: #e8eef4;
-}
-
-.lede strong {
-  color: #fff;
 }
 
 .header-links {
@@ -155,17 +144,17 @@ main {
 }
 
 .swatch {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 1px solid #333;
   display: inline-block;
   flex-shrink: 0;
 }
 
-.swatch.split {
-  background: linear-gradient(90deg, #6a6ad4 50%, #7dcc7d 50%);
-  border-color: #222;
+.swatch.knn-pass {
+  background: #7dcc7d;
+  border: 2.5px solid #6a6ad4;
 }
 
 .swatch-svg {
@@ -184,31 +173,47 @@ main {
   padding: 0.95rem 1rem 1rem;
 }
 
-.rho-hero {
+.terms {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.term {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0.55rem 0.85rem;
+  align-items: start;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.term:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.term-eq {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  font-size: 0.92rem;
+  color: var(--blue);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.term-eq-rho {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
+  align-items: center;
+  gap: 0.4rem 0.55rem;
 }
 
-.rho-line {
-  display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-}
-
-.rho-label {
-  font-size: 1.15rem;
+.term-ex {
+  margin: 0;
+  font-size: 0.78rem;
   color: var(--muted);
-}
-
-.rho-value {
-  font-variant-numeric: tabular-nums;
-  font-size: 2rem;
-  font-weight: 750;
-  letter-spacing: -0.03em;
-  color: var(--blue);
+  line-height: 1.4;
 }
 
 .badge {
@@ -237,7 +242,7 @@ main {
 }
 
 .rho-meter {
-  margin: 0.7rem 0 0.85rem;
+  margin: 0.85rem 0 0;
 }
 
 .rho-meter-track {
@@ -279,47 +284,6 @@ main {
   margin-top: 0.25rem;
   font-size: 0.72rem;
   color: var(--muted);
-}
-
-.counts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-  margin: 0 0 0.85rem;
-}
-
-.counts > div {
-  background: #f5f7fa;
-  border-radius: 8px;
-  padding: 0.55rem 0.7rem;
-}
-
-.counts dt {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-
-.counts dd {
-  margin: 0.15rem 0 0;
-  font-variant-numeric: tabular-nums;
-  font-weight: 650;
-  font-size: 0.95rem;
-}
-
-.formulas {
-  font-size: 0.88rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.55;
-}
-
-.formulas p {
-  margin: 0.2rem 0;
-}
-
-.formulas .eq {
-  overflow-wrap: anywhere;
 }
 
 .finite-k {
@@ -440,6 +404,13 @@ select {
   background: #fff8e1;
 }
 
+@media (max-width: 520px) {
+  .term {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
 @media (min-width: 880px) {
   .site-header h1 {
     font-size: 1.7rem;
@@ -447,7 +418,7 @@ select {
 
   main {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
     align-items: start;
     gap: 1rem 1.15rem;
     padding: 1.15rem 1rem 1.5rem;

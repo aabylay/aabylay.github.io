@@ -14,15 +14,9 @@
     <div class="header-inner">
       <p class="kicker"><a href="https://aabylay.github.io/">aabylay.github.io</a></p>
       <h1>GLS Correlation Demo</h1>
-      <p class="lede">
-        GLS compares how often a filter fires <strong>near the query</strong> vs <strong>in the whole set</strong>.
-        Counts, not distances — so local density does not fool it.
-      </p>
       <nav class="header-links" aria-label="Paper and code">
         <a href="https://arxiv.org/abs/2602.11443">Paper (abstract)</a>
         <a href="https://arxiv.org/pdf/2602.11443">PDF</a>
-        <a href="https://github.com/aabylay/ANN-benchmark-HQ">Code</a>
-        <a href="https://aabylay.github.io/gls/">This demo</a>
         <a href="https://aabylay.github.io/">Author site</a>
       </nav>
     </div>
@@ -38,7 +32,7 @@
         <li><span class="swatch" style="background:#7dcc7d;border-color:#333"></span> Pass filter, not in <i>k</i>-NN</li>
         <li><span class="swatch" style="background:#c8c8c8;border-color:#333"></span> Fail filter, not in <i>k</i>-NN</li>
         <li><span class="swatch" style="background:#6a6ad4;border-color:#222"></span> In <i>k</i>-NN, fail filter</li>
-        <li><span class="swatch split"></span> In <i>k</i>-NN <strong>and</strong> pass filter</li>
+        <li><span class="swatch knn-pass"></span> In <i>k</i>-NN <strong>and</strong> pass filter</li>
         <li>
           <svg class="swatch-svg" viewBox="0 0 16 16" aria-hidden="true">
             <polygon points="8,1.2 9.9,6.1 15.1,6.2 11,9.4 12.6,14.5 8,11.6 3.4,14.5 5,9.4 0.9,6.2 6.1,6.1"
@@ -57,12 +51,26 @@
 
     <section class="side-panel">
       <div class="metrics-card">
-        <div class="rho-hero">
-          <div class="rho-line">
-            <span class="rho-label">ρ<sub>q</sub></span>
-            <span class="rho-value" id="rho-value">—</span>
+        <div class="terms" id="terms">
+          <div class="term">
+            <div class="term-eq" id="term-g">—</div>
+            <p class="term-ex">Global selectivity: how often the filter fires in the whole set.</p>
           </div>
-          <span class="badge" id="badge" hidden></span>
+          <div class="term">
+            <div class="term-eq" id="term-l">—</div>
+            <p class="term-ex">Local selectivity: how often the filter fires among the query’s <i>k</i> nearest neighbors.</p>
+          </div>
+          <div class="term">
+            <div class="term-eq" id="term-r">—</div>
+            <p class="term-ex">Selectivity ratio: local vs global. <i>r</i> &gt; 1 enrichment, <i>r</i> &lt; 1 depletion.</p>
+          </div>
+          <div class="term">
+            <div class="term-eq term-eq-rho">
+              <span id="term-rho">—</span>
+              <span class="badge" id="badge" hidden></span>
+            </div>
+            <p class="term-ex">GLS correlation: sign of local vs global. Positive → easier filtered queries; negative → harder.</p>
+          </div>
         </div>
         <div class="rho-meter" aria-hidden="true">
           <div class="rho-meter-track">
@@ -71,17 +79,6 @@
           </div>
           <div class="rho-meter-labels"><span>−1 depletion</span><span>0</span><span>+1 enrichment</span></div>
         </div>
-        <dl class="counts" id="counts">
-          <div>
-            <dt>Global</dt>
-            <dd id="count-g">—</dd>
-          </div>
-          <div>
-            <dt>Local</dt>
-            <dd id="count-l">—</dd>
-          </div>
-        </dl>
-        <div class="formulas" id="formulas"></div>
         <p class="finite-k" id="finite-k" hidden></p>
         <p class="mode-hint" id="mode-hint"></p>
       </div>

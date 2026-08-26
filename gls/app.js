@@ -297,25 +297,11 @@ function drawStar(ctx, x, y, outer) {
   ctx.stroke();
 }
 
-function drawPoint(ctx, x, y, radius, fill, stroke, lineWidth, split) {
-  if (split) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.fillStyle = "#6a6ad4";
-    ctx.fillRect(x - radius - 1, y - radius - 1, radius + 1, radius * 2 + 2);
-    ctx.fillStyle = "#7dcc7d";
-    ctx.fillRect(x, y - radius - 1, radius + 1, radius * 2 + 2);
-    ctx.restore();
-  } else {
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = fill;
-    ctx.fill();
-  }
+function drawPoint(ctx, x, y, radius, fill, stroke, lineWidth) {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = fill;
+  ctx.fill();
   ctx.strokeStyle = stroke;
   ctx.lineWidth = lineWidth;
   ctx.stroke();
@@ -333,7 +319,7 @@ function syncCanvasSize() {
     canvas.height = h;
   }
   const size = rect.width;
-  const pad = Math.max(14, Math.min(22, size * 0.04));
+  const pad = Math.max(16, Math.min(24, size * 0.045));
   plotLayout = { size, pad, plotSize: size - 2 * pad, dpr };
   return true;
 }
@@ -349,7 +335,7 @@ function draw(m) {
   ctx.fillStyle = "#fafafa";
   ctx.fillRect(pad, pad, plotSize, plotSize);
 
-  const rPt = state.n > 700 ? 2.35 : state.n > 400 ? 2.7 : 3.15;
+  const rPt = (state.n > 700 ? 2.35 : state.n > 400 ? 2.7 : 3.15) * 1.5;
   const [qx, qy] = toCanvas(state.qx, state.qy);
 
   ctx.save();
@@ -372,15 +358,15 @@ function draw(m) {
   for (let i = 0; i < n; i++) {
     if (inKnn[i]) continue;
     const [px, py] = toCanvas(x[i], y[i]);
-    if (pass[i]) drawPoint(ctx, px, py, rPt, "#7dcc7d", "#333", 1, false);
-    else drawPoint(ctx, px, py, rPt, "#c8c8c8", "#333", 1, false);
+    if (pass[i]) drawPoint(ctx, px, py, rPt, "#7dcc7d", "#333", 1);
+    else drawPoint(ctx, px, py, rPt, "#c8c8c8", "#333", 1);
   }
-  const rKnn = rPt + 0.35;
+  const rKnn = rPt + 0.5;
   for (let i = 0; i < n; i++) {
     if (!inKnn[i]) continue;
     const [px, py] = toCanvas(x[i], y[i]);
-    if (pass[i]) drawPoint(ctx, px, py, rKnn, "#7dcc7d", "#222", 1.5, true);
-    else drawPoint(ctx, px, py, rKnn, "#6a6ad4", "#222", 1.5, false);
+    if (pass[i]) drawPoint(ctx, px, py, rKnn, "#7dcc7d", "#6a6ad4", 2);
+    else drawPoint(ctx, px, py, rKnn, "#6a6ad4", "#222", 1.5);
   }
   ctx.restore();
 
@@ -400,7 +386,21 @@ function draw(m) {
 }
 
 function renderPanel(m) {
-  el.rhoValue.textContent = m.rho === null ? "n/a" : fmt(m.rho, 3);
+  const sg = fmt(m.sigmaG, 3);
+  const sl = fmt(m.sigmaL, 3);
+  el.termG.innerHTML =
+    "σ<sub>g</sub> = N<sub>f</sub>/N = " + m.nG + "/" + state.n + " = " + sg;
+  el.termL.innerHTML =
+    "σ<sub>l</sub> = N<sub>l</sub>/k = " + m.nL + "/" + state.k + " = " + sl;
+
+  if (!(m.sigmaG > 0)) {
+    el.termR.innerHTML = "r = σ<sub>l</sub>/σ<sub>g</sub> = n/a";
+    el.termRho.innerHTML = "ρ<sub>q</sub> = n/a";
+  } else {
+    el.termR.innerHTML =
+      "r = σ<sub>l</sub>/σ<sub>g</sub> = " + sl + "/" + sg + " = " + fmt(m.r, 3);
+    el.termRho.innerHTML = "ρ<sub>q</sub> = " + fmt(m.rho, 3);
+  }
 
   if (m.rho === null) {
     el.badge.hidden = true;
@@ -422,11 +422,6 @@ function renderPanel(m) {
     }
   }
 
-  el.countG.textContent = nGLine(m);
-  el.countL.textContent = nLLine(m);
-
-  el.formulas.innerHTML = formulaHTML(m);
-
   const expectedLocal = m.sigmaG * state.k;
   if (m.sigmaG > 0 && expectedLocal <= 3) {
     el.finiteK.hidden = false;
@@ -439,53 +434,6 @@ function renderPanel(m) {
   }
 
   el.modeHint.textContent = MODE_HINTS[state.mode] || "";
-}
-
-function nGLine(m) {
-  return m.nG + "/" + state.n + "  ·  σ_g = " + fmt(m.sigmaG, 3);
-}
-
-function nLLine(m) {
-  return m.nL + "/" + state.k + "  ·  σ_l = " + fmt(m.sigmaL, 3);
-}
-
-function formulaHTML(m) {
-  const sg = fmt(m.sigmaG, 3);
-  const sl = fmt(m.sigmaL, 3);
-  let rLine;
-  let rhoLine;
-  if (!(m.sigmaG > 0)) {
-    rLine = "r = σ<sub>l</sub> / σ<sub>g</sub> = n/a";
-    rhoLine = "ρ<sub>q</sub> = (r − 1) / (r + 1) = n/a";
-  } else {
-    const r = fmt(m.r, 3);
-    const rho = fmt(m.rho, 3);
-    rLine = "r = σ<sub>l</sub> / σ<sub>g</sub> = " + sl + " / " + sg + " = " + r;
-    rhoLine =
-      "ρ<sub>q</sub> = (r − 1) / (r + 1) = (" + r + " − 1) / (" + r + " + 1) = " + rho;
-  }
-  return (
-    "<p class=\"eq\">σ<sub>g</sub> = |{v ∈ D : φ(v)=1}| / N = " +
-    m.nG +
-    " / " +
-    state.n +
-    " = " +
-    sg +
-    "</p>" +
-    "<p class=\"eq\">σ<sub>l</sub> = |{v ∈ N<sub>q</sub> : φ(v)=1}| / k = " +
-    m.nL +
-    " / " +
-    state.k +
-    " = " +
-    sl +
-    "</p>" +
-    "<p class=\"eq\">" +
-    rLine +
-    "</p>" +
-    "<p class=\"eq\">" +
-    rhoLine +
-    "</p>"
-  );
 }
 
 function syncControls() {
@@ -533,12 +481,12 @@ function onNChanged(n) {
 
 function bind() {
   el.plot = document.getElementById("plot");
-  el.rhoValue = document.getElementById("rho-value");
+  el.termG = document.getElementById("term-g");
+  el.termL = document.getElementById("term-l");
+  el.termR = document.getElementById("term-r");
+  el.termRho = document.getElementById("term-rho");
   el.badge = document.getElementById("badge");
   el.rhoKnob = document.getElementById("rho-knob");
-  el.countG = document.getElementById("count-g");
-  el.countL = document.getElementById("count-l");
-  el.formulas = document.getElementById("formulas");
   el.finiteK = document.getElementById("finite-k");
   el.modeHint = document.getElementById("mode-hint");
   el.sigma = document.getElementById("sigma");
