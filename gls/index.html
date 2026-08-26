@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#002856">
+  <title>GLS Correlation Demo · Abylay Amanbayev</title>
+  <meta name="description" content="Interactive demo of global vs local filter selectivity (GLS) from Filtered Approximate Nearest Neighbor Search in Vector Databases, VLDB 2026 VecDB Workshop.">
+  <link rel="icon" type="image/png" href="../user.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <p class="kicker"><a href="https://aabylay.github.io/">aabylay.github.io</a></p>
+      <h1>GLS Correlation Demo</h1>
+      <p class="lede">
+        GLS compares how often a filter fires <strong>near the query</strong> vs <strong>in the whole set</strong>.
+        Counts, not distances — so local density does not fool it.
+      </p>
+      <nav class="header-links" aria-label="Paper and code">
+        <a href="https://arxiv.org/abs/2602.11443">Paper (abstract)</a>
+        <a href="https://arxiv.org/pdf/2602.11443">PDF</a>
+        <a href="https://github.com/aabylay/ANN-benchmark-HQ">Code</a>
+        <a href="https://aabylay.github.io/gls/">This demo</a>
+        <a href="https://aabylay.github.io/">Author site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="plot-panel" aria-label="Scatter plot">
+      <div class="plot-wrap">
+        <canvas id="plot" width="640" height="640" role="img"
+          aria-label="Unit square of dataset points, metadata filter, query star, and k-nearest-neighbor radius. Tap or drag to move the query."></canvas>
+      </div>
+      <ul class="legend" aria-label="Legend">
+        <li><span class="swatch" style="background:#7dcc7d;border-color:#333"></span> Pass filter, not in <i>k</i>-NN</li>
+        <li><span class="swatch" style="background:#c8c8c8;border-color:#333"></span> Fail filter, not in <i>k</i>-NN</li>
+        <li><span class="swatch" style="background:#6a6ad4;border-color:#222"></span> In <i>k</i>-NN, fail filter</li>
+        <li><span class="swatch split"></span> In <i>k</i>-NN <strong>and</strong> pass filter</li>
+        <li>
+          <svg class="swatch-svg" viewBox="0 0 16 16" aria-hidden="true">
+            <polygon points="8,1.2 9.9,6.1 15.1,6.2 11,9.4 12.6,14.5 8,11.6 3.4,14.5 5,9.4 0.9,6.2 6.1,6.1"
+              fill="#e05050" stroke="#222" stroke-width="1"/>
+          </svg>
+          Query <i>q</i>
+        </li>
+        <li>
+          <svg class="swatch-svg" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="5.5" fill="none" stroke="#6a6ad4" stroke-width="1.4" stroke-dasharray="2.5 2"/>
+          </svg>
+          <i>k</i>-NN radius
+        </li>
+      </ul>
+    </section>
+
+    <section class="side-panel">
+      <div class="metrics-card">
+        <div class="rho-hero">
+          <div class="rho-line">
+            <span class="rho-label">ρ<sub>q</sub></span>
+            <span class="rho-value" id="rho-value">—</span>
+          </div>
+          <span class="badge" id="badge" hidden></span>
+        </div>
+        <div class="rho-meter" aria-hidden="true">
+          <div class="rho-meter-track">
+            <span class="rho-meter-mid"></span>
+            <span class="rho-meter-knob" id="rho-knob"></span>
+          </div>
+          <div class="rho-meter-labels"><span>−1 depletion</span><span>0</span><span>+1 enrichment</span></div>
+        </div>
+        <dl class="counts" id="counts">
+          <div>
+            <dt>Global</dt>
+            <dd id="count-g">—</dd>
+          </div>
+          <div>
+            <dt>Local</dt>
+            <dd id="count-l">—</dd>
+          </div>
+        </dl>
+        <div class="formulas" id="formulas"></div>
+        <p class="finite-k" id="finite-k" hidden></p>
+        <p class="mode-hint" id="mode-hint"></p>
+      </div>
+
+      <form class="controls" id="controls" autocomplete="off" onsubmit="return false;">
+        <div class="control">
+          <div class="control-head">
+            <label for="sigma">Filter selectivity σ<sub>g</sub></label>
+            <span class="control-val" id="sigma-val">0.20</span>
+          </div>
+          <input type="range" id="sigma" min="0" max="1" step="0.01" value="0.20">
+        </div>
+
+        <div class="control">
+          <label for="mode">Geometry mode</label>
+          <select id="mode">
+            <option value="independent">Independent</option>
+            <option value="clustered" selected>Clustered</option>
+            <option value="gradient">Gradient</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <div class="control-head">
+            <label for="n">N (points)</label>
+            <span class="control-val" id="n-val">400</span>
+          </div>
+          <input type="range" id="n" min="100" max="1000" step="50" value="400">
+        </div>
+
+        <div class="control">
+          <div class="control-head">
+            <label for="k">k (neighbors)</label>
+            <span class="control-val" id="k-val">40</span>
+          </div>
+          <input type="range" id="k" min="1" max="400" step="1" value="40">
+          <p class="control-note" id="k-note">default k = round(0.1 N) = 40</p>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn" id="btn-resample">Resample points</button>
+          <button type="button" class="btn" id="btn-reshuffle">Reshuffle filter</button>
+          <button type="button" class="btn btn-gold" id="btn-reset">Reset</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Amanbayev, Tsan, Dang, Rusu.
+      <em>Filtered Approximate Nearest Neighbor Search in Vector Databases.</em>
+      VLDB 2026 VecDB Workshop.
+      <a href="https://arxiv.org/abs/2602.11443">arXiv:2602.11443</a>
+      · <a href="https://arxiv.org/pdf/2602.11443">PDF</a>
+      · <a href="https://github.com/aabylay/ANN-benchmark-HQ">code</a>
+    </p>
+    <p class="footer-meta">
+      <a href="https://aabylay.github.io/gls/">https://aabylay.github.io/gls/</a>
+      · <a href="https://aabylay.github.io/">author site</a>
+    </p>
+  </footer>
+
+  <noscript>
+    <p class="noscript">This demo needs JavaScript (vanilla Canvas, no libraries) to draw the plot and compute GLS.</p>
+  </noscript>
+  <script src="app.js"></script>
+</body>
+</html>
